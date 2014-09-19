@@ -1,0 +1,11 @@
+*.pyc
+*.swp
+*.swo
+*.log
+*.gz
+*.dump
+*.dmp
+*.svn
+.project
+.settings
+*.orig
