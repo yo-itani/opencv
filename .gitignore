@@ -11,3 +11,5 @@
 *.orig
 .pass
 web/devel/static/devel/img
+develop/img
+develop/src_img

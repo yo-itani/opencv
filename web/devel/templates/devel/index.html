@@ -1,2 +1,4 @@
-hello world<br />
-<img src="{{ STATIC_URL }}devel/img/result.jpg" />
+<div style="width:400px;">
+<img src="{{ STATIC_URL }}devel/img/{{ img_num }}.jpg" /><br />
+{% ifnotequal page 1 %}<span><a href="/devel/?page={{ page|add:"-1" }}">前へ</a></span>{% endifnotequal %}<span style="float:right;"><a href="/devel/?page={{ page|add:"1" }}">次へ</a></span>
+</dov>

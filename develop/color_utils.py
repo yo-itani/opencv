@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import math
 import pickle
 import cv2
 import numpy as np
+import collections
+from devel_color_utils import get_median_rgb, get_mean_rgb
 
 
 def get_cielab_histgram(img, mask=None):
@@ -130,6 +133,72 @@ def create_rgb_frequency_picle(img, pickle_file, height_range=None, width_range=
             else:
                 rgbs[rgb_str] = 1
     pickle.dump(rgbs, open(pickle_file, 'w'))
+
+
+def pick_color_circle(img, radius, shift_x=0, shift_y=0, most_common=10):
+    """ 指定した範囲(円)の色を返す
+
+        Args:
+            img: 対象画像(numpy.array)
+            radius: 半径
+            shift_x: 画像の中心からx軸方向にずらす量
+            shift_y: 画像の中心からy軸方向にずらす量
+            most_common: 出現頻度の高い色のうち何件を解析対象とするか
+        Returns:
+            (解析結果: (r, g, b), 原点:(x, y))
+    """
+    height, width = img.shape[:2]
+    origin = width / 2 + shift_x, height / 2 + shift_y
+    coordinates = get_circle_coordinates_all(origin, radius)
+    cv_hsvs = {}
+    cnt = collections.Counter()
+    gbr = np.zeros((1, 1, 3), np.uint8)
+    for w, h in coordinates:
+        gbr[0][0] = img[h][w]
+        cv_h, cv_s, cv_v = cv2.cvtColor(gbr, cv2.COLOR_BGR2HSV)[0][0]
+        g, b, r = gbr[0][0]
+        if cv_h in cv_hsvs:
+            cv_hsvs[cv_h].append((g, b, r))
+        else:
+            cv_hsvs[cv_h] = [(g, b, r)]
+        cnt[cv_h] += 1
+    rgb = get_median_rgb(cv_hsvs, cnt, most_common)
+    if not rgb:
+        rgb = get_mean_rgb(cv_hsvs, cnt, most_common)
+    return (rgb, origin)
+
+
+def get_hsv(hsv_img_val):
+    """ opencvが返してくる値をhsv値に変換する
+        (opencvは値を0〜255の範囲に収まる整数に変換して返してくるため)
+
+        Args:
+            hsv_img_val: opencvが返してくるhsv値(8ビット)
+        Returns:
+            一般的なhsv値: (h, s, v)
+    """
+    hsv_h = hsv_img_val[0] * 2
+    hsv_s = hsv_img_val[1] / 255.0
+    hsv_v = hsv_img_val[2] / 255.0
+    return (hsv_h, hsv_s, hsv_v)
+
+
+def get_circle_coordinates_all(origin, radius):
+    """ 指定した範囲(円)内の座標リストを返す
+
+        Args:
+            origin: 原点
+            radius: 半径
+        Returns:
+            座標リスト: [(x1, y1), (x2, y2), ...]
+    """
+    coordinates = []
+    for x in xrange(-radius, radius + 1):
+        abs_y = int(math.sin(math.acos(float(x) / radius)) * radius)
+        for y in xrange(-abs_y, abs_y + 1):
+            coordinates.append((x + origin[0], y + origin[1]))
+    return coordinates
+
 
 def main():
     pass
