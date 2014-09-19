@@ -10,3 +10,4 @@
 .settings
 *.orig
 .pass
+web/devel/static/devel/img
