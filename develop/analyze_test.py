@@ -11,10 +11,11 @@ import color_utils as utils
 
 SCRIPT_DIR = os.path.dirname(__file__)
 WIDTH = 200
-RADIUS = 10
+RADIUS = 5
 CANNY_THRESHOLD1 = 5
 CANNY_THRESHOLD2 = 25
-
+VIRTICAL = 0
+HORIZONTAL = 1
 
 def main(srcdir, dstdir):
     for i, f in enumerate(os.listdir(srcdir)):
@@ -41,15 +42,49 @@ def main(srcdir, dstdir):
             rgbs.append(rgb)
             cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
 
-            patterns = utils.get_color_pattern(rgbs, 40, 3)
+            left_origin, right_origin = get_top_left_right_coordinate(edge_img, RADIUS)
+            rgb, origin = utils.pick_color_circle(small_img, RADIUS, left_origin, most_common=3)
+            rgbs.append(rgb)
+            cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+            rgb, origin = utils.pick_color_circle(small_img, RADIUS, right_origin, most_common=3)
+            rgbs.append(rgb)
+            cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+            patterns = utils.get_color_pattern(rgbs, 40, 6)
             small_img_height = small_img.shape[0]
             campass = np.zeros((small_img_height * 2 + patterns.shape[0], WIDTH * 2, 3), np.uint8)
             campass[:small_img_height, :WIDTH,:] = small_img
             campass[:small_img_height, WIDTH:,:] = edge_img
             campass[small_img_height * 2:,:patterns.shape[1],:] = patterns
             cv2.imwrite('img/%s.jpg' % i, campass)
-        if i > 5:
+        #if i > 3:
+        #    break
+
+def get_top_left_right_coordinate(edge_img, radius):
+    """
+    """
+    MARGIN = 5
+    left_w, right_w = -1, -1
+    black = np.array([0, 0, 0])
+    # 上下を少しカットする
+    start_h = int(edge_img.shape[0] * 1 / 10.0)
+    end_h = int(edge_img.shape[0] * 9 / 10.0)
+    for w in xrange(0, edge_img.shape[1]):
+        if not np.array_equal(sum(edge_img[start_h:end_h,w,:]), black):
+            left_w = w
             break
+    left_h = get_nonzero_index(edge_img, left_w, VIRTICAL, revrse=False)
+    for w in xrange(edge_img.shape[1] - 1, -1, -1):
+        if not np.array_equal(sum(edge_img[start_h:end_h,w,:]), black):
+            right_w = w
+            break
+    right_h = get_nonzero_index(edge_img, right_w, VIRTICAL, revrse=False)
+    # 下に半径ほど落として中に半径ほど入れる
+    left_w += radius + MARGIN * 2
+    left_h += radius + MARGIN
+    right_w -= radius + MARGIN * 2
+    right_h += radius + MARGIN
+    return ((left_w, left_h), (right_w, right_h),)
+
 
 def get_under_left_right_coordinage(edge_img, radius):
     """ エッジ画像から左下と右下の座標を取得する
@@ -62,26 +97,34 @@ def get_under_left_right_coordinage(edge_img, radius):
     """
     MARGIN = 3
     mid_x = edge_img.shape[1] / 2
-    black = np.array([0, 0, 0])
     under_h, left_w, right_w = -1, -1, -1
     start_h = edge_img.shape[0] * 9 / 10
-    for h in xrange(start_h - 1, -1, -1):
-        if not np.array_equal(edge_img[h][mid_x], black):
-            under_h = h
-            break
+    under_h = get_nonzero_index(edge_img, mid_x, VIRTICAL, revrse=True, end=start_h)
     under_h = under_h - radius - MARGIN
-    for w in xrange(0, edge_img.shape[1]):
-        if not np.array_equal(edge_img[under_h][w], black):
-            left_w = w
-            break
+    left_w = get_nonzero_index(edge_img, under_h, HORIZONTAL, revrse=False)
     left_w = left_w + radius + MARGIN
-    for w in xrange(edge_img.shape[1] - 1, -1, -1):
-        if not np.array_equal(edge_img[under_h][w], black):
-            right_w = w
-            break
+    right_w = get_nonzero_index(edge_img, under_h, HORIZONTAL, revrse=True)
     right_w = right_w - radius - MARGIN
     return ((left_w, under_h), (right_w, under_h),)
 
+
+def get_nonzero_index(img, fixed_index, direction, revrse=False, end=None):
+    black = np.array([0, 0, 0])
+    if direction == VIRTICAL:
+        if not end:
+            end = img.shape[0]
+        arr = img[:,fixed_index,:]
+    else:
+        if not end:
+            end = img.shape[1]
+        arr = img[fixed_index,:,:]
+    if revrse:
+        iter = xrange(end - 1, -1, -1)
+    else:
+        iter = xrange(0, end)
+    for a in iter:
+        if not np.array_equal(arr[a], black):
+            return a
 
 def get_edge_img(img, threshold1, threshold2):
     """ エッジ画像を返す。

@@ -7,6 +7,10 @@ import numpy as np
 import collections
 from devel_color_utils import get_median_rgb, get_mean_rgb
 
+TO_TOP = 0
+TO_BOTTOM = 1
+TO_LEFT = 2
+TO_RIGHT = 3
 
 def get_cielab_histgram(img, mask=None):
     """ cielab形式のヒストグラムデータを返す。
@@ -213,6 +217,92 @@ def get_circle_coordinates_all(origin, radius):
         for y in xrange(-abs_y, abs_y + 1):
             coordinates.append((x + origin[0], y + origin[1]))
     return coordinates
+
+
+def get_nonzero_coordinate(img, fixed_index, direction, start_index=None):
+    """ 画像を走査し、(0, 0, 0)以外の値がきたらその座標を返す
+
+        directionが左右方向であればy=fixed_indexでx軸方向に、
+        上下方向であればx=fixed_indexでy軸方向に走査する
+        方向に走査する。
+
+        Args:
+            img: 走査する画像
+            fixed_index: 固定値
+            direction: TO_TOP, TO_BOTTOM, TO_LEFT, TO_RIGHTのいずれか
+            start_index: 走査を開始するindex。指定されていなければ
+            　　　　　　 画像の一番橋から走査する
+        Returns:
+            ヒットした箇所の座標
+    """
+    black = np.array([0, 0, 0])
+    if direction == TO_TOP or direction == TO_BOTTOM:
+        if not start_index:
+            start_index = img.shape[0]
+        arr = img[:,fixed_index,:]
+    else:
+        if not start_index:
+            start_index = img.shape[1]
+        arr = img[fixed_index,:,:]
+    if direction == TO_BOTTOM or direction == TO_RIGHT:
+        iter = xrange(0, start_index)
+    else:
+        iter = xrange(start_index - 1, -1, -1)
+    for a in iter:
+        if not np.array_equal(arr[a], black):
+            if direction == TO_TOP or direction == TO_BOTTOM:
+                return (fixed_index, a)
+            else:
+                return (a, fixed_index)
+    return None
+
+
+def get_small_img(img, small_width):
+    """ widthの幅まで縮小(比率維持)した画像を返す
+
+        Args:
+            img: 元画像(np.array形式)
+            small_width: 縮小後の画像の幅
+        Returns:
+            縮小画像(np.array形式)
+    """
+    height, width = img.shape[:2]
+    small_height = int(float(small_width) / width * height)
+    return cv2.resize(img, (small_width, small_height))
+
+
+def get_edge_img(img, threshold1, threshold2):
+    """ エッジ画像を返す。
+        カラー画像と結合するためにbgrに変換して返す
+
+        Args:
+            img: エッジ画像を取得したい画像(np.array)形式
+            threshold1: しきい値1
+            threshold2: しきい値2
+        Returns:
+            エッジ画像:(np.array形式)
+    """
+    gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    edge_img = cv2.Canny(gray_img, threshold1, threshold2)
+    return cv2.cvtColor(edge_img, cv2.COLOR_GRAY2BGR)
+
+def get_avg_color(rgbs, num_colors):
+    """ ほかとあまりさがない色二つの平均を返す """
+    diffs = {}
+    rgbs = np.array(rgbs)
+    for i, rgb in enumerate(rgbs):
+        diff_val = 0
+        for diff_rgb in rgbs - rgb:
+            diff_val += math.sqrt(diff_rgb[0] * diff_rgb[0] + diff_rgb[1] * diff_rgb[1] + diff_rgb[2] * diff_rgb[2])
+        diffs[i] = diff_val
+
+    r, g, b = 0, 0, 0
+    for i, (k, v) in enumerate(sorted(diffs.items(), key=lambda x:x[1])[:num_colors]):
+        r += rgbs[k][0]
+        g += rgbs[k][1]
+        b += rgbs[k][2]
+    count = i + 1
+    return (r / count, g / count, b / count)
 
 
 def main():
