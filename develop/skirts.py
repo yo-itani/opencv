@@ -15,7 +15,7 @@ CANNY_THRESHOLD1 = 5
 CANNY_THRESHOLD2 = 25
 VIRTICAL = 0
 HORIZONTAL = 1
-DELETE_RATE = 10.0
+DELETE_RATE = 20.0
 
 def main(srcdir, dstdir):
     """ 調査用画像作成
@@ -28,48 +28,48 @@ def main(srcdir, dstdir):
             # 画像縮小取得
             small_img = get_small_img(img, WIDTH)
 
-            ## エッジ画像取得
-            #edge_img = get_edge_img(small_img, CANNY_THRESHOLD1, CANNY_THRESHOLD2)
+            # エッジ画像取得
+            edge_img = get_edge_img(small_img, CANNY_THRESHOLD1, CANNY_THRESHOLD2)
 
-            #rgbs = []
-            ## センターの色取得
-            #rgb, origin = pick_center_color(small_img, RADIUS, shift_x=0, shift_y=-0, most_common=3)
-            #rgbs.append(rgb)
-            #cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+            rgbs = []
+            # センターの色取得
+            rgb, origin = pick_center_color(small_img, RADIUS, shift_x=0, shift_y=-0, most_common=3)
+            rgbs.append(rgb)
+            cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
 
-            ## 左下隅、右下隅の色取得
-            #left_origin, right_origin = _get_under_left_right_coordinage(edge_img, RADIUS)
-            #rgb, origin = pick_color_circle(small_img, RADIUS, left_origin, most_common=3)
-            #rgbs.append(rgb)
-            #cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
-            #rgb, origin = pick_color_circle(small_img, RADIUS, right_origin, most_common=3)
-            #rgbs.append(rgb)
-            #cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+            # 左下隅、右下隅の色取得
+            left_origin, right_origin = _get_under_left_right_coordinage(edge_img, RADIUS)
+            rgb, origin = pick_color_circle(small_img, RADIUS, left_origin, most_common=3)
+            rgbs.append(rgb)
+            cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+            rgb, origin = pick_color_circle(small_img, RADIUS, right_origin, most_common=3)
+            rgbs.append(rgb)
+            cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
 
-            ## 左上、右上の色取得
-            #left_origin, right_origin = _get_top_left_right_coordinate(edge_img, RADIUS)
-            #rgb, origin = pick_color_circle(small_img, RADIUS, left_origin, most_common=3)
-            #rgbs.append(rgb)
-            #cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
-            #rgb, origin = pick_color_circle(small_img, RADIUS, right_origin, most_common=3)
-            #rgbs.append(rgb)
-            #cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+            # 左上、右上の色取得
+            left_origin, right_origin = _get_top_left_right_coordinate(edge_img, RADIUS)
+            rgb, origin = pick_color_circle(small_img, RADIUS, left_origin, most_common=3)
+            rgbs.append(rgb)
+            cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+            rgb, origin = pick_color_circle(small_img, RADIUS, right_origin, most_common=3)
+            rgbs.append(rgb)
+            cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
 
-            ## セパレータとして黒を入れた後判定値を入れる
-            #rgbs.append((0, 0, 0))
-            #rgbs.append(get_avg_color(rgbs[1:], 2))
-            #rgbs.append(get_color(fpath_name))
+            # セパレータとして黒を入れた後判定値を入れる
+            rgbs.append((0, 0, 0))
+            rgbs.append(get_avg_color(rgbs[1:], 2))
+            rgbs.append((0, 0, 0))
 
             ## 描画
-            #patterns = get_color_pattern(rgbs, 40, 8)
-            #small_img_height = small_img.shape[0]
-            #campass = np.zeros((small_img_height * 2 + patterns.shape[0], WIDTH * 2, 3), np.uint8)
-            #campass[:small_img_height, :WIDTH,:] = small_img
-            #campass[:small_img_height, WIDTH:,:] = edge_img
-            #campass[small_img_height * 2:,:patterns.shape[1],:] = patterns
-            cv2.imwrite('%s/%s.jpg' % (dstdir, i), small_img)
-        if i > 10:
-            break
+            patterns = get_color_pattern(rgbs, 40, 8)
+            small_img_height = small_img.shape[0]
+            campass = np.zeros((small_img_height * 2 + patterns.shape[0], WIDTH * 2, 3), np.uint8)
+            campass[:small_img_height, :WIDTH,:] = small_img
+            campass[:small_img_height, WIDTH:,:] = edge_img
+            campass[small_img_height * 2:,:patterns.shape[1],:] = patterns
+            cv2.imwrite('%s/%s.jpg' % (dstdir, i), campass)
+        #if i > 20:
+        #    break
 
 def get_color(filename):
     """ 引数で渡されたTシャツ画像からそのTシャツの色を返す
@@ -110,6 +110,22 @@ def _get_top_left_right_coordinate(edge_img, radius):
         Returns:
             座標のtuple: ((left_x, left_y), (right_x, right_y))
     """
+    MARGIN = 10
+    mid_x = edge_img.shape[1] / 2
+    under_h, left_w, right_w = -1, -1, -1
+    # 上を少しカットする
+    start_h = int(edge_img.shape[0] * (DELETE_RATE - 1) / DELETE_RATE)
+    mid_coordinate = get_nonzero_coordinate(edge_img, mid_x, cu.TO_BOTTOM, start_index=start_h)
+
+    # ヒットした箇所(Tシャツの裾)から少し上に上げる
+    top_h = mid_coordinate[1] + radius + MARGIN
+    left_coordinate = get_nonzero_coordinate(edge_img, top_h, cu.TO_RIGHT)
+    right_coordinate = get_nonzero_coordinate(edge_img, top_h, cu.TO_LEFT)
+
+    # 内側半径程度入れる 
+    return ((left_coordinate[0] + radius + MARGIN, left_coordinate[1]),
+            (right_coordinate[0] - radius - MARGIN, right_coordinate[1]),)
+
     MARGIN = 5
     left_w, right_w = -1, -1
     black = np.array([0, 0, 0])
@@ -141,7 +157,7 @@ def _get_under_left_right_coordinage(edge_img, radius):
         Returns:
             座標のtuple: ((left_x, left_y), (right_x, right_y))
     """
-    MARGIN = 3
+    MARGIN = 10
     mid_x = edge_img.shape[1] / 2
     under_h, left_w, right_w = -1, -1, -1
     # 下を少しカットする
@@ -153,7 +169,7 @@ def _get_under_left_right_coordinage(edge_img, radius):
     left_coordinate = get_nonzero_coordinate(edge_img, under_h, cu.TO_RIGHT)
     right_coordinate = get_nonzero_coordinate(edge_img, under_h, cu.TO_LEFT)
 
-    # 内側に半径程度入れる 
+    # 内側半径程度入れる 
     return ((left_coordinate[0] + radius + MARGIN, left_coordinate[1]),
             (right_coordinate[0] - radius - MARGIN, right_coordinate[1]),)
 

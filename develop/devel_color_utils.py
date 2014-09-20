@@ -52,7 +52,6 @@ def get_mean_rgb(cv_hsvs, cnt, most_common):
     """
     sum_b, sum_g, sum_r, counter = 0, 0, 0, 0
     for cv_h, c in cnt.most_common(most_common):
-        print cv_h
         for bgr in cv_hsvs[cv_h]:
             counter += 1
             sum_b += bgr[0]
