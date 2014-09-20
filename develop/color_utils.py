@@ -135,7 +135,7 @@ def create_rgb_frequency_picle(img, pickle_file, height_range=None, width_range=
     pickle.dump(rgbs, open(pickle_file, 'w'))
 
 
-def pick_color_circle(img, radius, shift_x=0, shift_y=0, most_common=10):
+def pick_center_color(img, radius, shift_x=0, shift_y=0, most_common=10):
     """ 指定した範囲(円)の色を返す
 
         Args:
@@ -149,6 +149,21 @@ def pick_color_circle(img, radius, shift_x=0, shift_y=0, most_common=10):
     """
     height, width = img.shape[:2]
     origin = width / 2 + shift_x, height / 2 + shift_y
+    return pick_color_circle(img, radius, origin, most_common)
+
+
+def pick_color_circle(img, radius, origin, most_common=10):
+    """ 指定した範囲(円)の色を返す
+
+        Args:
+            img: 対象画像(numpy.array)
+            radius: 半径
+            shift_x: 画像の中心からx軸方向にずらす量
+            shift_y: 画像の中心からy軸方向にずらす量
+            most_common: 出現頻度の高い色のうち何件を解析対象とするか
+        Returns:
+            (解析結果: (r, g, b), 原点:(x, y))
+    """
     coordinates = get_circle_coordinates_all(origin, radius)
     cv_hsvs = {}
     cnt = collections.Counter()
