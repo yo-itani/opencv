@@ -37,23 +37,26 @@ def main(srcdir, dstdir):
             rgbs.append(rgb)
             cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
 
-            # 左下隅、右下隅の色取得
-            left_origin, right_origin = _get_under_left_right_coordinage(edge_img, RADIUS)
-            rgb, origin = pick_color_circle(small_img, RADIUS, left_origin, most_common=3)
-            rgbs.append(rgb)
-            cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
-            rgb, origin = pick_color_circle(small_img, RADIUS, right_origin, most_common=3)
-            rgbs.append(rgb)
-            cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+            try:
+                # 左下隅、右下隅の色取得
+                left_origin, right_origin = _get_under_left_right_coordinage(edge_img, RADIUS)
+                rgb, origin = pick_color_circle(small_img, RADIUS, left_origin, most_common=3)
+                rgbs.append(rgb)
+                cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+                rgb, origin = pick_color_circle(small_img, RADIUS, right_origin, most_common=3)
+                rgbs.append(rgb)
+                cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
 
-            # 左上、右上の色取得
-            left_origin, right_origin = _get_top_left_right_coordinate(edge_img, RADIUS)
-            rgb, origin = pick_color_circle(small_img, RADIUS, left_origin, most_common=3)
-            rgbs.append(rgb)
-            cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
-            rgb, origin = pick_color_circle(small_img, RADIUS, right_origin, most_common=3)
-            rgbs.append(rgb)
-            cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+                # 左上、右上の色取得
+                left_origin, right_origin = _get_top_left_right_coordinate(edge_img, RADIUS)
+                rgb, origin = pick_color_circle(small_img, RADIUS, left_origin, most_common=3)
+                rgbs.append(rgb)
+                cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+                rgb, origin = pick_color_circle(small_img, RADIUS, right_origin, most_common=3)
+                rgbs.append(rgb)
+                cv2.circle(small_img, origin, RADIUS, (255, 255, 0), 1)
+            except:
+                print i
 
             # セパレータとして黒を入れた後判定値を入れる
             rgbs.append((0, 0, 0))
@@ -68,8 +71,8 @@ def main(srcdir, dstdir):
             campass[:small_img_height, WIDTH:,:] = edge_img
             campass[small_img_height * 2:,:patterns.shape[1],:] = patterns
             cv2.imwrite('%s/%s.jpg' % (dstdir, i), campass)
-        #if i > 20:
-        #    break
+        if i > 200:
+            break
 
 def get_color(filename):
     """ 引数で渡されたTシャツ画像からそのTシャツの色を返す
@@ -111,7 +114,7 @@ def _get_top_left_right_coordinate(edge_img, radius):
             座標のtuple: ((left_x, left_y), (right_x, right_y))
     """
     MARGIN = 10
-    mid_x = edge_img.shape[1] / 2
+    mid_x = int(edge_img.shape[1] * 11.0 / 20.0)
     under_h, left_w, right_w = -1, -1, -1
     # 上を少しカットする
     start_h = int(edge_img.shape[0] * (DELETE_RATE - 1) / DELETE_RATE)
@@ -158,7 +161,7 @@ def _get_under_left_right_coordinage(edge_img, radius):
             座標のtuple: ((left_x, left_y), (right_x, right_y))
     """
     MARGIN = 10
-    mid_x = edge_img.shape[1] / 2
+    mid_x = int(edge_img.shape[1] * 11.0 / 20.0)
     under_h, left_w, right_w = -1, -1, -1
     # 下を少しカットする
     start_h = int(edge_img.shape[0] * (DELETE_RATE - 1) / DELETE_RATE)

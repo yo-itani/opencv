@@ -10,7 +10,7 @@ def index(request):
     if 'type' in request.GET:
         type = request.GET['type']
     else:
-        type = None
+        type = 't_shirts'
     context = {
         'page': page,
         'img_num': page - 1,
