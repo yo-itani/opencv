@@ -7,8 +7,13 @@ def index(request):
         page = int(request.GET['page'])
     else:
         page = 1
+    if 'type' in request.GET:
+        type = request.GET['type']
+    else:
+        type = None
     context = {
         'page': page,
         'img_num': page - 1,
+        'type': type,
     }
     return render(request, 'devel/index.html', context)

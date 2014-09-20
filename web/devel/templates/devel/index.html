@@ -1,4 +1,6 @@
 <div style="width:400px;">
-{% ifnotequal page 1 %}<span><a href="/devel/?page={{ page|add:"-1" }}">前へ</a></span>{% endifnotequal %}<span style="float:right;"><a href="/devel/?page={{ page|add:"1" }}">次へ</a></span>
-<img src="{{ STATIC_URL }}devel/img/{{ img_num }}.jpg" /><br />
-</dov>
+<div>{% ifnotequal page 1 %}<span><a href="/devel/?page={{ page|add:"-1" }}{% if type %}&amp;type={{ type }}{% endif %}">前へ</a></span>{% else %}&nbsp;{% endifnotequal %}<span style="float:right;"><a href="/devel/?page={{ page|add:"1" }}{% if type %}&amp;type={{ type }}{% endif %}">次へ</a></span></div>
+<div>
+<img src="{{ STATIC_URL }}devel/img/{% if type %}{{ type }}/{% endif %}{{ img_num }}.jpg" /><br />
+</div>
+</div>
