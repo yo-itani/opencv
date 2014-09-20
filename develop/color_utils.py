@@ -12,6 +12,9 @@ TO_BOTTOM = 1
 TO_LEFT = 2
 TO_RIGHT = 3
 
+class ColorUtilsException(Exception):
+    pass
+
 def get_cielab_histgram(img, mask=None):
     """ cielab形式のヒストグラムデータを返す。
 
@@ -202,6 +205,21 @@ def get_hsv(hsv_img_val):
     return (hsv_h, hsv_s, hsv_v)
 
 
+def get_lab(lab_img_val):
+    """ opencvが返してくる値をCIEL*a*b*値に変換する
+        (opencvは値を0〜255の範囲に収まる整数に変換して返してくるため)
+
+        Args:
+            lab_img_val: opencvが返してくるlab値(8ビット)
+        Returns:
+            一般的なhsv値: (L, a, b)
+    """
+    lab_h = lab_img_val[0] * 255.0 / 100.0
+    lab_s = lab_img_val[1] - 128
+    lab_v = lab_img_val[2] - 128
+    return (lab_h, lab_s, lab_v)
+
+
 def get_circle_coordinates_all(origin, radius):
     """ 指定した範囲(円)内の座標リストを返す
 
@@ -303,6 +321,81 @@ def get_avg_color(rgbs, num_colors):
         b += rgbs[k][2]
     count = i + 1
     return (r / count, g / count, b / count)
+
+
+def rgbstr2rgb(rgbstr):
+    """ 文字列形式のRGBをint型のrgbに変換して返す
+
+        変換できない場合は例外を返す
+
+        Args:
+            rgbstr: 文字列形式のRGB(#rrggbb形式 or rr,gg,bb形式)
+        Returns
+            RGB: (r, g, b) intのtuple。
+    """
+    if rgbstr.startswith('#'):
+        rgbstr = rgbstr[1:]
+    if ',' in rgbstr:
+        rgbs = rgbstr.split(',')
+        if len(rgbs) != 3:
+            raise ColorUtilsException('invalid format')
+        else:
+            values = []
+            for v in rgbs:
+                v = v.strip()
+                if not v.isdigit():
+                    raise ColorUtilsException('invalid value(not digit)')
+                v = int(v)
+                if v < 0 or v > 255:
+                    raise ColorUtilsException('invalid value(out of range)')
+                values.append(v)
+            return tuple(values)
+    else:
+        if len(rgbstr) != 6:
+            raise ColorUtilsException('invalid format')
+        if not rgbstr.isalnum():
+            raise ColorUtilsException('invalid format')
+        rstr = rgbstr[:2]
+        gstr = rgbstr[2:4]
+        bstr = rgbstr[4:6]
+        return (int(rstr, 16), int(gstr, 16), int(bstr, 16))
+
+
+def rgb2bgr(rgb):
+    """ rgbをbgrに変換する
+
+        Args:
+            RGB(r, g, b)
+        Returns
+            BGR(b, g, r)
+    """
+    return (rgb[2], rgb[1], rgb[0])
+
+
+def bgr2hsv(bgr):
+    """ BGRをHSVに変換する
+
+        Args:
+            BGR(b, g, r)
+        Returns:
+            HSV(h, s, v)
+    """
+    img = np.array([[np.uint8(bgr)]])
+    cv2_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    return get_hsv(cv2_hsv[0][0])
+
+
+def bgr2lab(bgr):
+    """ BGRをCIEL*a*b*に変換する
+
+        Args:
+            BGR(b, g, r)
+        Returns:
+            CIEL*a*b*(L, a, b)
+    """
+    img = np.array([[np.uint8(bgr)]])
+    cv2_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    return get_lab(cv2_lab[0][0])
 
 
 def main():
