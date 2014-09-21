@@ -69,7 +69,7 @@ sS'lab'
 p30
 (g8
 (g20
-S'\x00\x00\x00\x00\x00\x80y@'
+S'______O@'
 p31
 tp32
 Rp33
@@ -122,7 +122,7 @@ tp54
 sg30
 (g8
 (g20
-S'\x00\x00\x00\x00\x00\xb0|@'
+S'\xa6\xa5\xa5\xa5\xa5\xa5Q@'
 p55
 tp56
 Rp57
@@ -175,7 +175,7 @@ tp78
 sg30
 (g8
 (g20
-S'\x9a\x99\x99\x99\x99\x0b\x83@'
+S'nnnnnnW@'
 p79
 tp80
 Rp81
@@ -228,7 +228,7 @@ tp102
 sg30
 (g8
 (g20
-S'33333\x93`@'
+S'dddddd4@'
 p103
 tp104
 Rp105
@@ -281,7 +281,7 @@ tp126
 sg30
 (g8
 (g20
-S'\xcd\xcc\xcc\xcc\xccxv@'
+S'\xa6\xa5\xa5\xa5\xa5\xa5K@'
 p127
 tp128
 Rp129
@@ -334,7 +334,7 @@ tp150
 sg30
 (g8
 (g20
-S'fffff\x9as@'
+S'\x1e\x1e\x1e\x1e\x1e\x1eH@'
 p151
 tp152
 Rp153
@@ -387,7 +387,7 @@ tp174
 sg30
 (g8
 (g20
-S'fffff6\x81@'
+S'------U@'
 p175
 tp176
 Rp177
@@ -440,7 +440,7 @@ tp198
 sg30
 (g8
 (g20
-S'33333\xc3s@'
+S'PPPPPPH@'
 p199
 tp200
 Rp201
@@ -493,7 +493,7 @@ tp222
 sg30
 (g8
 (g20
-S'\x9a\x99\x99\x99\x99\xd5u@'
+S'\xdd\xdc\xdc\xdc\xdc\xdcJ@'
 p223
 tp224
 Rp225
@@ -599,7 +599,7 @@ tp270
 sg30
 (g8
 (g20
-S'\xcd\xcc\xcc\xcc\xcc\x14t@'
+S'\xb5\xb4\xb4\xb4\xb4\xb4H@'
 p271
 tp272
 Rp273
@@ -652,7 +652,7 @@ tp294
 sg30
 (g8
 (g20
-S'\x00\x00\x00\x00\x00\xe8w@'
+S'iiiiiiM@'
 p295
 tp296
 Rp297
@@ -705,7 +705,7 @@ tp318
 sg30
 (g8
 (g20
-S'\xcd\xcc\xcc\xcc\xcc\xa4}@'
+S'<<<<<<R@'
 p319
 tp320
 Rp321
@@ -758,7 +758,7 @@ tp342
 sg30
 (g8
 (g20
-S'\x00\x00\x00\x00\x00\x88q@'
+S'\x92\x91\x91\x91\x91\x91E@'
 p343
 tp344
 Rp345
@@ -811,7 +811,7 @@ tp366
 sg30
 (g8
 (g20
-S'\x00\x00\x00\x00\x00R\x84@'
+S'\x00\x00\x00\x00\x00\x00Y@'
 p367
 tp368
 Rp369
@@ -864,7 +864,7 @@ tp390
 sg30
 (g8
 (g20
-S'\x9a\x99\x99\x99\x99ik@'
+S'\xdd\xdc\xdc\xdc\xdc\xdc@@'
 p391
 tp392
 Rp393

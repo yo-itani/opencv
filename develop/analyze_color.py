@@ -27,7 +27,7 @@ def main(srcdir, dstdir):
             create_color_pick_img(srcfile, dstfile,
                                   _get_top_left_right_coordinate,
                                   _get_under_left_right_coordinage)
-        if i > 10:
+        if i > 200:
             break
 
 def get_color(filename):
@@ -134,6 +134,8 @@ def _get_under_left_right_coordinage(edge_img, radius):
 
 
 if __name__ == '__main__':
-    import sys
-    type = sys.argv[1]
+    #import sys
+    #type = sys.argv[1]
+    type = 't_shirts'
+    #type = 'one_piece'
     main(os.path.join(SCRIPT_DIR, 'src_img/web/%s' % type), os.path.join(SCRIPT_DIR, 'img/%s' % type))

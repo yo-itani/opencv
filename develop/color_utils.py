@@ -214,7 +214,7 @@ def get_lab(lab_img_val):
         Returns:
             一般的なhsv値: (L, a, b)
     """
-    lab_h = lab_img_val[0] * 255.0 / 100.0
+    lab_h = lab_img_val[0] * 100.0 / 255.0
     lab_s = lab_img_val[1] - 128
     lab_v = lab_img_val[2] - 128
     return (lab_h, lab_s, lab_v)
@@ -315,12 +315,14 @@ def get_avg_color(rgbs, num_colors):
         diffs[i] = diff_val
 
     r, g, b = 0, 0, 0
+    keys = []
     for i, (k, v) in enumerate(sorted(diffs.items(), key=lambda x:x[1])[:num_colors]):
         r += rgbs[k][0]
         g += rgbs[k][1]
         b += rgbs[k][2]
-    count = i + 1
-    return (r / count, g / count, b / count)
+        keys.append(k)
+    count = len(keys)
+    return (r / count, g / count, b / count), keys
 
 
 def rgbstr2rgb(rgbstr):
