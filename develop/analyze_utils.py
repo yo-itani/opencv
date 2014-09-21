@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import os
-import math
 
 import cv2
 import numpy as np
 
-import color_pickle as cp
 import color_utils as cu
 import colortype
 
@@ -27,7 +25,7 @@ TOP_RIGHT_CIRCLE_COLOR = (0, 255, 0)
 BOTTOM_LEFT_CIRCLE_COLOR = (255, 0, 0)
 BOTTOM_RIGHT_CIRCLE_COLOR = (255, 255, 0)
 
-COLORS = colortype.load_tsv('colortype.tsv')
+COLORS = colortype.load_tsv(os.path.join(SCRIPT_DIR, 'colortype.tsv'))
 
 def main():
     pass

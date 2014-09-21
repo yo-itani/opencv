@@ -16,11 +16,14 @@ VIRTICAL = 0
 HORIZONTAL = 1
 DELETE_RATE = 20.0
 
-def main(srcdir, dstdir):
+def main(srcdir, dstdir, index=None):
     """ 調査用画像作成
 
     """
     for i, f in enumerate(os.listdir(srcdir)):
+        if index:
+            if i != int(index) - 1:
+                continue
         if f.endswith('.jpg'):
             srcfile = os.path.join(srcdir, f)
             dstfile = '%s/%s.jpg' % (dstdir, i)
@@ -138,5 +141,6 @@ if __name__ == '__main__':
     #import sys
     #type = sys.argv[1]
     type = 't_shirts'
+    index = 1
     #type = 'one_piece'
-    main(os.path.join(SCRIPT_DIR, 'src_img/web/%s' % type), os.path.join(SCRIPT_DIR, 'img/%s' % type))
+    main(os.path.join(SCRIPT_DIR, 'src_img/web/%s' % type), os.path.join(SCRIPT_DIR, 'img/%s' % type), index)
