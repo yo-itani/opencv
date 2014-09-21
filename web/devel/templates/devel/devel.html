@@ -1,0 +1,21 @@
+<html>
+<head>
+</head>
+<body>
+<div style="width:400px;">
+<div>{% ifnotequal page 1 %}<span><a href="{{ url }}?page={{ page|add:"-1" }}{% if type %}&amp;type={{ type }}{% endif %}">前へ</a></span>{% else %}&nbsp;{% endifnotequal %}<span style="float:right;"><a href="{{ url }}?page={{ page|add:"1" }}{% if type %}&amp;type={{ type }}{% endif %}">次へ</a></span></div>
+<div>
+<img src="{{ STATIC_URL }}devel/img/{% if type %}{{ type }}/{% endif %}{{ img_num }}.jpg" /><br />
+</div>
+<div>
+<span><a href="{{ url }}">Tシャツ</a></span>
+<span><a href="{{ url }}?type=skirts">スカート</a></span>
+<span><a href="{{ url }}?type=pants">パンツ</a></span>
+<span><a href="{{ url }}?type=tops">トップス</a></span>
+<span><a href="{{ url }}?type=one_piece">ワンピース・チュニック</a></span>
+<span><a href="{{ url }}?type=jacket">ジャケット</a></span>
+<span><a href="{{ url }}?type=coat">コート</a></span>
+<span><a href="{{ url }}?type=formal">フォーマル</a></span>
+</div>
+</body>
+</html>

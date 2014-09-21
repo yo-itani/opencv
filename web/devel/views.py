@@ -2,7 +2,7 @@
 
 import os
 from django.shortcuts import render
-import modules.analyze_color as ac
+import modules.analyze_color_devel as ac
 
 # Create your views here.
 
@@ -40,4 +40,4 @@ def create(request):
         'img_num': page - 1,
         'type': type,
     }
-    return render(request, 'devel/index.html', context)
+    return render(request, 'devel/devel.html', context)

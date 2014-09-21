@@ -2,6 +2,7 @@
 
 import csv
 import math
+import numpy as np
 import pickle
 
 #from bs4 import BeautifulSoup
@@ -112,21 +113,36 @@ def create_tsv(dic, tsvfile):
         writer.writerow(row)
 
 
-def get_color(rgb, colors):
+def get_color_devel(rgb, colors):
+    NUM_VALS = 10
     cielab = cu.bgr2lab(cu.rgb2bgr(rgb))
-    mindiff = 99999999
+    mindiff_indexes = np.array([-1] * NUM_VALS)
+    mindiffs = np.array([9999999] * NUM_VALS)
     for i, colorvalue in enumerate(colors):
         ldiff = cielab[0] - colorvalue[CIELAB][0]
         adiff = cielab[1] - colorvalue[CIELAB][1]
         bdiff = cielab[2] - colorvalue[CIELAB][2]
         diff = math.sqrt(ldiff * ldiff + adiff * adiff + bdiff * bdiff)
-        if mindiff > diff:
-            mindiff_index = i
-            mindiff = diff
+        bigger = mindiffs[(mindiffs > diff)]
+        num_bigger = len(bigger)
+        if num_bigger:
+            interrupt_index = NUM_VALS - num_bigger
+            print interrupt_index
+            mindiffs[interrupt_index + 1:] = mindiffs[:-(interrupt_index + 1)]
+            mindiffs[interrupt_index] = diff
+            mindiff_indexes[interrupt_index + 1:] = mindiff_indexes[:-(interrupt_index + 1)]
+            mindiff_indexes[interrupt_index] = i
+        #if mindiff > diff:
+        #    mindiff_index = i
+        #    mindiff = diff
+    mindiff_index = mindiff_indexes[0]
+    mindiff = mindiffs[0]
+    rgbs = [colors[index][RGB] for index in mindiff_indexes[:9]]
     return {
             INDEX: colors[mindiff_index][INDEX],
             COLOR_NAME: colors[mindiff_index][COLOR_NAME],
-            RGB: colors[mindiff_index][RGB],
+            #RGB: colors[mindiff_index][RGB],
+            RGB: rgbs,
             BRIGHTNESS: colors[mindiff_index][BRIGHTNESS],
             VIVIDNESS: colors[mindiff_index][VIVIDNESS],
             DIFF: mindiff, }
