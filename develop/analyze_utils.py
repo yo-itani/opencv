@@ -2,7 +2,6 @@
 
 import os
 import math
-import pickle
 
 import cv2
 import numpy as np
@@ -28,7 +27,7 @@ TOP_RIGHT_CIRCLE_COLOR = (0, 255, 0)
 BOTTOM_LEFT_CIRCLE_COLOR = (255, 0, 0)
 BOTTOM_RIGHT_CIRCLE_COLOR = (255, 255, 0)
 
-COLORTYPE_DATA = pickle.load(open('colortype.pickle'))
+COLORS = colortype.load_tsv('colortype.tsv')
 
 def main():
     pass
@@ -90,11 +89,8 @@ def create_color_pick_img(srcfile, dstfile,
     rgbs.append((0, 0, 0))
     rgbs.append(analyzed_color)
 
-    color = colortype.get_color(analyzed_color, COLORTYPE_DATA)
-    #color_name, rgb, diff = get_color_name(analyzed_color)
-    #color_name2, rgb2, diff2 = get_color_name2(analyzed_color)
+    color = colortype.get_color(analyzed_color, COLORS)
     rgbs.append(rgb)
-    #rgbs.append(rgb2)
 
     ## 描画
     patterns = cu.get_color_pattern(rgbs, 40, 9)
@@ -114,37 +110,6 @@ def create_color_pick_img(srcfile, dstfile,
     cv2.putText(campass, text, (0, pict_height + text_height), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0))
     cv2.imwrite(dstfile, campass)
 
-def get_color_name(rgb):
-    lab = cu.bgr2lab(cu.rgb2bgr(rgb))
-    mindiff = 99999999
-    mincolor_name = None
-    minrgb = None
-    for k, v in BASECOLORS.items():
-        ldiff = lab[0] - v[cp.CIELAB][0]
-        adiff = lab[1] - v[cp.CIELAB][1]
-        bdiff = lab[2] - v[cp.CIELAB][2]
-        diff = math.sqrt(ldiff * ldiff + adiff * adiff + bdiff * bdiff)
-        if mindiff > diff:
-            mindiff = diff
-            mincolor_name = v[cp.COLOR_NAME]
-            minrgb = k
-    return mincolor_name, minrgb, mindiff
-
-def get_color_name2(rgb):
-    lab = cu.bgr2lab(cu.rgb2bgr(rgb))
-    mindiff = 99999999
-    mincolor_name = None
-    minrgb = None
-    for k, v in COLORS.items():
-        ldiff = lab[0] - v[cp.CIELAB][0]
-        adiff = lab[1] - v[cp.CIELAB][1]
-        bdiff = lab[2] - v[cp.CIELAB][2]
-        diff = math.sqrt(ldiff * ldiff + adiff * adiff + bdiff * bdiff)
-        if mindiff > diff:
-            mindiff = diff
-            mincolor_name = v[cp.COLOR_NAME]
-            minrgb = k
-    return mincolor_name, minrgb, mindiff
 
 def get_corner_names(keys):
     """

@@ -335,6 +335,8 @@ def rgbstr2rgb(rgbstr):
         Returns
             RGB: (r, g, b) intのtuple。
     """
+    if rgbstr.startswith('(') and rgbstr.endswith(')'):
+        rgbstr = rgbstr[1:-1]
     if rgbstr.startswith('#'):
         rgbstr = rgbstr[1:]
     if ',' in rgbstr:

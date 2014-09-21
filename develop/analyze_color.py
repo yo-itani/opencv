@@ -27,7 +27,8 @@ def main(srcdir, dstdir):
             create_color_pick_img(srcfile, dstfile,
                                   _get_top_left_right_coordinate,
                                   _get_under_left_right_coordinage)
-        if i > 200:
+        #if i > 200:
+        if i > 20:
             break
 
 def get_color(filename):

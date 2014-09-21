@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import csv
 import math
 import pickle
 
@@ -17,6 +18,7 @@ COLORTYPE_NAMES = 'color_names'
 COLORTYPE_NAMES_ENG = 'color_names_eng'
 COLORTYPE_CODE = 'colortype_code'
 
+INDEX = 'index'
 COLOR_NAME = 'colorname'
 BRIGHTNESS = 'brightness'
 VIVIDNESS = 'vividness'
@@ -71,12 +73,45 @@ def create_colortype_pickle(picklefile):
                     COLORTYPE_NAMES_ENG: color_names_eng, }, open(picklefile, 'w'))
 
 
-def get_color(rgb, colortype_data):
+def load_tsv(tsvfile):
+    colorvalues = []
+    for row in csv.reader(open(tsvfile), delimiter='\t'):
+        index = row[0]
+        rgb = cu.rgbstr2rgb(row[1])
+        bgr = cu.rgb2bgr(rgb)
+        color_name = row[2]
+        brightness = int(row[3])
+        vividness = int(row[4])
+        colorvalues.append({
+            INDEX: index,
+            RGB: rgb,
+            COLOR_NAME: color_name,
+            BRIGHTNESS: brightness,
+            VIVIDNESS: vividness,
+            BGR: bgr,
+            HSV: cu.bgr2hsv(bgr),
+            CIELAB: cu.bgr2lab(bgr),
+        })
+    return colorvalues
+
+def create_tsv(dic, tsvfile):
+    color_values = dic[COLOR_VALUES]
+    color_names_eng = dic[COLORTYPE_NAMES_ENG]
+    writer = csv.writer(open(tsvfile, 'w'), delimiter='\t')
+    for i, colorvalue in enumerate(color_values):
+        row = []
+        row.append(str(i))
+        row.append(str(colorvalue[RGB]))
+        row.append(color_names_eng[colorvalue[COLORTYPE_CODE]])
+        row.append(str(colorvalue[BRIGHTNESS]))
+        row.append(str(colorvalue[VIVIDNESS]))
+        writer.writerow(row)
+
+
+def get_color(rgb, colors):
     cielab = cu.bgr2lab(cu.rgb2bgr(rgb))
     mindiff = 99999999
-    color_values = colortype_data[COLOR_VALUES]
-    color_names_eng = colortype_data[COLORTYPE_NAMES_ENG]
-    for i, colorvalue in enumerate(color_values):
+    for i, colorvalue in enumerate(colors):
         ldiff = cielab[0] - colorvalue[CIELAB][0]
         adiff = cielab[1] - colorvalue[CIELAB][1]
         bdiff = cielab[2] - colorvalue[CIELAB][2]
@@ -84,14 +119,19 @@ def get_color(rgb, colortype_data):
         if mindiff > diff:
             mindiff_index = i
             mindiff = diff
-    colortype_code = color_values[mindiff_index][COLORTYPE_CODE]
-    return {COLOR_NAME: color_names_eng[colortype_code],
-            RGB: color_values[mindiff_index][RGB],
-            BRIGHTNESS: color_values[mindiff_index][BRIGHTNESS],
-            VIVIDNESS: color_values[mindiff_index][VIVIDNESS],
+    return {
+            INDEX: mindiff_index,
+            COLOR_NAME: colors[mindiff_index][COLOR_NAME],
+            RGB: colors[mindiff_index][RGB],
+            BRIGHTNESS: colors[mindiff_index][BRIGHTNESS],
+            VIVIDNESS: colors[mindiff_index][VIVIDNESS],
             DIFF: mindiff, }
 
 
 if __name__ == '__main__':
+    dic = pickle.load(open('colortype.pickle'))
+    tsvfile = 'colortype.tsv'
+    create_tsv(dic, tsvfile)
+    print load_tsv(tsvfile)
     main()
 
