@@ -28,8 +28,6 @@ TOP_RIGHT_CIRCLE_COLOR = (0, 255, 0)
 BOTTOM_LEFT_CIRCLE_COLOR = (255, 0, 0)
 BOTTOM_RIGHT_CIRCLE_COLOR = (255, 255, 0)
 
-#BASECOLORS = pickle.load(open('basecolor.pickle'))
-#COLORS = pickle.load(open('color.pickle'))
 COLORTYPE_DATA = pickle.load(open('colortype.pickle'))
 
 def main():
