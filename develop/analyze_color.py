@@ -134,4 +134,6 @@ def _get_under_left_right_coordinage(edge_img, radius):
 
 
 if __name__ == '__main__':
-    main(os.path.join(SCRIPT_DIR, 'src_img/web/skirts'), os.path.join(SCRIPT_DIR, 'img/skirts'))
+    import sys
+    type = sys.argv[1]
+    main(os.path.join(SCRIPT_DIR, 'src_img/web/%s' % type), os.path.join(SCRIPT_DIR, 'img/%s' % type))
