@@ -88,7 +88,7 @@ def create_color_pick_img(srcfile, dstfile,
     rgbs.append(analyzed_color)
 
     color = colortype.get_color(analyzed_color, COLORS)
-    rgbs.append(rgb)
+    rgbs.append(color[colortype.RGB])
 
     ## 描画
     patterns = cu.get_color_pattern(rgbs, 40, 9)
@@ -104,7 +104,7 @@ def create_color_pick_img(srcfile, dstfile,
     campass[pict_height + text_height:,:patterns.shape[1],:] = patterns
     text = get_corner_names(keys)
     cv2.putText(campass, text, (0, pict_height + text_height - 16), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0))
-    text = color[colortype.COLOR_NAME] + ': %s' % color[colortype.DIFF]
+    text = '%s: %s :%s' % (color[colortype.INDEX], color[colortype.COLOR_NAME], color[colortype.DIFF])
     cv2.putText(campass, text, (0, pict_height + text_height), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0))
     cv2.imwrite(dstfile, campass)
 

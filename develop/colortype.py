@@ -77,6 +77,9 @@ def main():
 def load_tsv(tsvfile):
     colorvalues = []
     for row in csv.reader(open(tsvfile), delimiter='\t'):
+        # #で始まる行をスキップ
+        if row[0].startswith('#'):
+            continue
         index = row[0]
         rgb = cu.rgbstr2rgb(row[1])
         bgr = cu.rgb2bgr(rgb)
@@ -121,7 +124,7 @@ def get_color(rgb, colors):
             mindiff_index = i
             mindiff = diff
     return {
-            INDEX: mindiff_index,
+            INDEX: colors[mindiff_index][INDEX],
             COLOR_NAME: colors[mindiff_index][COLOR_NAME],
             RGB: colors[mindiff_index][RGB],
             BRIGHTNESS: colors[mindiff_index][BRIGHTNESS],

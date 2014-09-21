@@ -6,5 +6,5 @@ from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('devel.views',
     url(r'^$', 'index'),
-    url(r'^skirts$', 'skirts'),
+    url(r'^create/$', 'create'),
 )
