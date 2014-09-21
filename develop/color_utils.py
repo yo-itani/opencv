@@ -272,7 +272,11 @@ def get_nonzero_coordinate(img, fixed_index, direction, start_index=None):
                 return (fixed_index, a)
             else:
                 return (a, fixed_index)
-    return None
+    else:
+        if direction == TO_TOP or direction == TO_BOTTOM:
+            return (fixed_index, start_index / 2)
+        else:
+            return (start_index / 2, fixed_index)
 
 
 def get_small_img(img, small_width):

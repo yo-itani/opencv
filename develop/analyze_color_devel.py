@@ -217,13 +217,13 @@ def get_corner_names(keys):
     corners = []
     for k in keys:
         if k == 0:
-            corners.append('bottom-left')
-        elif k == 1:
-            corners.append('bottom-right')
-        elif k == 2:
             corners.append('top-left')
-        else:
+        elif k == 1:
             corners.append('top-right')
+        elif k == 2:
+            corners.append('bottom-left')
+        else:
+            corners.append('bottom-right')
     return ','.join(corners)
 
 

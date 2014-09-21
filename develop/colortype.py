@@ -55,7 +55,7 @@ def main():
 #                    colorvalues.append(colorvalue)
 #    # 日本語が使えないので英語表記を追加
 #    color_names_eng = {
-#        0: 'white, black, grey',
+#        0: 'white, black, gray',
 #        1: 'red',
 #        2: 'brown, orange',
 #        3: 'yellow',
@@ -115,28 +115,30 @@ def create_tsv(dic, tsvfile):
 
 def get_color_devel(rgb, colors):
     NUM_VALS = 10
-    cielab = cu.bgr2lab(cu.rgb2bgr(rgb))
+    bgr = cu.rgb2bgr(rgb)
+    cielab = cu.bgr2lab(bgr)
+    #hsv = cu.bgr2hsv(bgr)
     mindiff_indexes = np.array([-1] * NUM_VALS)
     mindiffs = np.array([9999999] * NUM_VALS)
     for i, colorvalue in enumerate(colors):
-        ldiff = cielab[0] - colorvalue[CIELAB][0]
-        adiff = cielab[1] - colorvalue[CIELAB][1]
-        bdiff = cielab[2] - colorvalue[CIELAB][2]
-        diff = math.sqrt(ldiff * ldiff + adiff * adiff + bdiff * bdiff)
+        diff = _get_diff(cielab, colorvalue[CIELAB])
+        #diff = _get_diff(rgb, colorvalue[RGB])
+        #diff = _get_diff(hsv, colorvalue[HSV])
         bigger = mindiffs[(mindiffs > diff)]
         num_bigger = len(bigger)
         if num_bigger:
             interrupt_index = NUM_VALS - num_bigger
-            print interrupt_index
             mindiffs[interrupt_index + 1:] = mindiffs[:-(interrupt_index + 1)]
             mindiffs[interrupt_index] = diff
             mindiff_indexes[interrupt_index + 1:] = mindiff_indexes[:-(interrupt_index + 1)]
             mindiff_indexes[interrupt_index] = i
-        #if mindiff > diff:
-        #    mindiff_index = i
-        #    mindiff = diff
     mindiff_index = mindiff_indexes[0]
     mindiff = mindiffs[0]
+    for i, index in enumerate(mindiff_indexes):
+        if colors[index][COLOR_NAME] != 'white, black, gray':
+            mindiff_index = mindiff_indexes[i]
+            mindiff = mindiffs[i]
+            break
     rgbs = [colors[index][RGB] for index in mindiff_indexes[:9]]
     return {
             INDEX: colors[mindiff_index][INDEX],
@@ -147,11 +149,18 @@ def get_color_devel(rgb, colors):
             VIVIDNESS: colors[mindiff_index][VIVIDNESS],
             DIFF: mindiff, }
 
+def _get_diff(vals1, vals2):
+    sum_diff = 0
+    for i, (val1, val2) in enumerate(zip(vals1, vals2)):
+        sum_diff += (val1 - val2) * (val1 - val2)
+    return math.sqrt(sum_diff)
+
 
 if __name__ == '__main__':
-    dic = pickle.load(open('colortype.pickle'))
-    tsvfile = 'colortype.tsv'
-    create_tsv(dic, tsvfile)
-    print load_tsv(tsvfile)
-    main()
+    #dic = pickle.load(open('colortype.pickle'))
+    tsvfile = 'colortype.org.tsv'
+    #create_tsv(dic, tsvfile)
+    for val in load_tsv(tsvfile):
+        print val[INDEX], val[COLOR_NAME], val[RGB], val[CIELAB]
+    #main()
 
