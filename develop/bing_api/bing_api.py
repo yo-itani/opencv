@@ -18,6 +18,8 @@ RELATED_SEARCH = 'RelatedSearch'
 JSON = 'json'
 ATOM = 'atom'
 
+EXAMPLE_JSON_DATA = 'result.example.json'
+
 def get(api_key, query, service='', format=JSON, top=50, skip=0, market=None, params=None):
     """ bing search apiから結果を取得する
 
@@ -53,5 +55,20 @@ def get(api_key, query, service='', format=JSON, top=50, skip=0, market=None, pa
         return ElementTree.fromstring(response.content)
 
 
+def test_get():
+    """ result.example.jsonを読み込みディクショナリを返す関数
+
+        dataを受け取った後の処理を開発するときに使う.
+
+        Args:
+            なし
+        Returns:
+            result.example.jsonのデータ(ディクショナリ)
+    """
+    import os
+    import json
+    script_dir = os.path.dirname(__file__)
+    return json.load(open(os.path.join(script_dir, EXAMPLE_JSON_DATA)))
+
 if __name__ == '__main__':
-    pass
+    test_get()
