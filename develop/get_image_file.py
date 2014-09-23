@@ -28,8 +28,8 @@ def main(args):
         os.remove(data_tsv)
     os.system(CREATE_TSV_CMD % (IMG_INFO_TSV_COLUMNS + (data_tsv,)))
     for skip in xrange(0, num, TOP):
-        try:
-            for item in bing_api.get(BING_API_KEY, query, bing_api.IMAGE, bing_api.JSON, TOP, skip)['d']['results']:
+        for item in bing_api.get(BING_API_KEY, query, bing_api.IMAGE, bing_api.JSON, TOP, skip)['d']['results']:
+            try:
                 content_type = item.get('ContentType', '')
                 image_url = item.get('MediaUrl', '')
                 source_url = item.get('SourceUrl', '')
@@ -39,10 +39,11 @@ def main(args):
                         resize_img(img_file, dest_dir, WIDTH)
                         os.system(CREATE_TSV_CMD % (counter, image_url, img_file, source_url, data_tsv))
                         counter += 1
-            time.sleep(1)
-            print '%s〜%s done' % (skip, skip + TOP,)
-        except Exception, e:
-            print str(e)
+            except Exception, e:
+                print str(e)
+        time.sleep(1)
+        print '%s〜%s done' % (skip, skip + TOP,)
+
 
 def resize_img(img_file, dest_dir, width):
     """ 画像ファイルを引数で与えられた幅に縮める
