@@ -16,7 +16,7 @@ IMG_INFO_TSV = 'img_info.tsv'
 IMG_INFO_TSV_COLUMNS = ('No.', 'image url', 'image file', 'source url',)
 CREATE_TSV_CMD = 'echo "%s" >> %%s' % ('\t'.join(['%s'] * len(IMG_INFO_TSV_COLUMNS)),)
 WIDTH = 200
-
+TIMEOUT = 10.0
 
 def main(args):
     query = args.query
@@ -28,19 +28,21 @@ def main(args):
         os.remove(data_tsv)
     os.system(CREATE_TSV_CMD % (IMG_INFO_TSV_COLUMNS + (data_tsv,)))
     for skip in xrange(0, num, TOP):
-        for item in bing_api.get(BING_API_KEY, query, bing_api.IMAGE, bing_api.JSON, TOP, skip)['d']['results']:
-            content_type = item.get('ContentType', '')
-            image_url = item.get('MediaUrl', '')
-            source_url = item.get('SourceUrl', '')
-            if content_type and image_url:
-                img_file = get_img(image_url, content_type, counter, dest_dir)
-                if img_file:
-                    resize_img(img_file, dest_dir, WIDTH)
-                    os.system(CREATE_TSV_CMD % (counter, image_url, img_file, source_url, data_tsv))
-                    counter += 1
-        time.sleep(1)
-        print '%s〜%s done' % (skip, skip + TOP,)
-
+        try:
+            for item in bing_api.get(BING_API_KEY, query, bing_api.IMAGE, bing_api.JSON, TOP, skip)['d']['results']:
+                content_type = item.get('ContentType', '')
+                image_url = item.get('MediaUrl', '')
+                source_url = item.get('SourceUrl', '')
+                if content_type and image_url:
+                    img_file = get_img(image_url, content_type, counter, dest_dir)
+                    if img_file:
+                        resize_img(img_file, dest_dir, WIDTH)
+                        os.system(CREATE_TSV_CMD % (counter, image_url, img_file, source_url, data_tsv))
+                        counter += 1
+            time.sleep(1)
+            print '%s〜%s done' % (skip, skip + TOP,)
+        except Exception, e:
+            print str(e)
 
 def resize_img(img_file, dest_dir, width):
     """ 画像ファイルを引数で与えられた幅に縮める
@@ -74,14 +76,19 @@ def get_img(image_url, content_type, number, dest_dir):
     if not ext:
          ext = os.path.splitext(image_url)
     img_file = '%s.%08d%s' % (img_type, number, ext,)
-    r = requests.get(image_url)
-    if r.headers['content-type'].startswith(content_type) and \
-       r.status_code == 200:
-        fp = open(os.path.join(dest_dir, img_file), 'wb')
-        fp.write(r.content)
-        fp.close()
-        return img_file
-    return None
+    try:
+        r = requests.get(image_url, timeout=TIMEOUT)
+        if r.headers['content-type'].startswith(content_type) and \
+           r.status_code == 200:
+            fp = open(os.path.join(dest_dir, img_file), 'wb')
+            fp.write(r.content)
+            fp.close()
+            return img_file
+        return None
+    except Exception, e:
+        print str(e)
+        print '%s could not get' % (image_url,)
+        return None
 
 
 def get_ext(content_type):
