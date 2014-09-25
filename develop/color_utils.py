@@ -279,7 +279,7 @@ def get_nonzero_coordinate(img, fixed_index, direction, start_index=None):
             return (start_index / 2, fixed_index)
 
 
-def get_small_img(img, small_width):
+def get_resized_img(img, small_width):
     """ widthの幅まで縮小(比率維持)した画像を返す
 
         Args:

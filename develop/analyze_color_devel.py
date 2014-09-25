@@ -58,7 +58,7 @@ def create_color_pick_img(srcfile, dstfile):
     """
     img = cv2.imread(srcfile)
     # 画像縮小取得
-    small_img = cu.get_small_img(img, WIDTH)
+    small_img = cu.get_resized_img(img, WIDTH)
     small_img_height, small_img_width = small_img.shape[:2]
     # エッジ画像取得
     edge_img = cu.get_edge_img(small_img, CANNY_THRESHOLD1, CANNY_THRESHOLD2)
@@ -117,11 +117,12 @@ def create_color_pick_img(srcfile, dstfile):
     color = colortype.get_color_devel(analyzed_color, COLORS)
 
     ## 描画
+    small_img2 = small_img.copy()
     pattern_rgbs = [analyzed_color] + color[colortype.RGB]
     patterns = cu.get_color_pattern(pattern_rgbs, PATTERN_SIZE, 10)
     patterns[:,PATTERN_SIZE * len(pattern_rgbs):,:] = 255
     small_img_height = small_img.shape[0]
-    pict_height = small_img_height
+    pict_height = small_img_height * 2
     text_height = 40 
     pattern_height = patterns.shape[0]
     pict_width =  WIDTH * 2
@@ -129,12 +130,25 @@ def create_color_pick_img(srcfile, dstfile):
     campass[pict_height:pict_height + text_height,:,:] = 255
     campass[:small_img_height, :WIDTH,:] = small_img
     campass[:small_img_height, WIDTH:,:] = edge_img
+
+
+    mask = np.zeros(small_img2.shape[:2],np.uint8)
+    bgdModel = np.zeros((1,65),np.float64)
+    fgdModel = np.zeros((1,65),np.float64)
+    rect = (5, 20, small_img_width - 5, small_img_height - 20)
+    cv2.grabCut(small_img2,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_RECT)
+    mask2 = np.where((mask==2)|(mask==0),0,1).astype('uint8')
+    small_img2 = small_img2 * mask2[:,:,np.newaxis]
+    campass[small_img_height:small_img_height * 2, :WIDTH,:] = small_img2
     campass[pict_height + text_height:,:patterns.shape[1],:] = patterns
     text = get_corner_names(keys)
     cv2.putText(campass, text, (0, pict_height + text_height - 20), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0))
     text = '%s: %s :%s' % (color[colortype.INDEX], color[colortype.COLOR_NAME], color[colortype.DIFF])
     cv2.putText(campass, text, (0, pict_height + text_height - 4), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0))
     cv2.imwrite(dstfile, campass)
+
+
+
 
 
 def _get_top_left_right_coordinate(edge_img, radius):

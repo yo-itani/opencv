@@ -38,7 +38,7 @@ def create_color_pick_img(srcfile, dstfile,
     """
     img = cv2.imread(srcfile)
     # 画像縮小取得
-    small_img = cu.get_small_img(img, WIDTH)
+    small_img = cu.get_resize_img(img, WIDTH)
     small_img_height, small_img_width = small_img.shape[:2]
     # エッジ画像取得
     edge_img = cu.get_edge_img(small_img, CANNY_THRESHOLD1, CANNY_THRESHOLD2)
