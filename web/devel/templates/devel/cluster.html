@@ -1,0 +1,12 @@
+<html>
+<head>
+</head>
+<body>
+<div style="width:400px;">
+<div>{% ifnotequal page 1 %}<span><a href="{{ url }}?page={{ page|add:"-1" }}{% if num %}&amp;num={{ num }}{% endif %}">前へ</a></span>{% else %}&nbsp;{% endifnotequal %}<span style="float:right;"><a href="{{ url }}?page={{ page|add:"1" }}{% if num %}&amp;num={{ num }}{% endif %}">次へ</a></span></div>
+<div>
+<img src="{{ STATIC_URL }}devel/src_img/bayon/{{ img }}" /><br />
+</div>
+<div>{% ifnotequal num 1 %}<span><a href="{{ url }}?num={{ num|add:"-1" }}{% if page %}&amp;page={{ page }}{% endif %}">前へ</a></span>{% else %}&nbsp;{% endifnotequal %}<span style="float:right;"><a href="{{ url }}?num={{ num|add:"1" }}{% if page %}&amp;page={{ page }}{% endif %}">次へ</a></span></div>
+</body>
+</html>
