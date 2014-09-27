@@ -1,6 +1,15 @@
 {% extends 'devel/devel_base.html' %}
+{% load devel_extras %}
 {% block content %}
-<div>
-<img src="{{ STATIC_URL }}devel/{{ image_file }}" /><br />
+<div class="bgwhite" style="text-align:center; width:400px; padding:10px;">
+	<div style="height:380px;">
+	{{ image.name }}<br />
+	<div class="{% ifequal image.status 1 %}bggreen{% else %}bgred{% endifequal %}" style="margin:0 auto; padding:30px;width:230px;">
+		<img style="border:2px #F5DEB3 solid;" src="{{ STATIC_URL }}devel/{{ image.get_image_path }}" /><br />
+	</div>
+	</div>
+	<div style="padding:10px;">
+		<a class="button" href="{{ url|add_page:"-1" }}">&lt;</a> <a class="button green" href="{{ url|add_page:"1" }}?status={{ image.AVAILABLE }}">OK</a> <a class="button red" href="{{ url|add_page:"1" }}?status={{ image.UNAVAILABLE }}">NG</a> <a class="button" href="{{ url|add_page:"1" }}">&gt;</a>
+	</div>
 </div>
 {% endblock %}
