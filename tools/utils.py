@@ -48,3 +48,22 @@ def get_sha1(filename):
     sha1 = hashlib.sha1(fp.read()).hexdigest()
     fp.close()
     return sha1
+
+def get_related_path(base_dir, abs_path):
+    """ 引数で渡された相対パスをbase_dirからの相対パスに変換する
+
+        Args:
+            base_dir: プロジェクトのベースディレクトリ
+            abs_path: 絶対パスで表されたディレクトリ
+        Returns
+            相対パス化されたディレクトリ abs_path = base_dir + related_path
+            abs_pathがbase_dirを含まない場合はabs_pathをそのまま返す
+    """
+    print abs_path, base_dir
+    if abs_path.startswith(base_dir):
+        path = abs_path.replace(base_dir, "")
+        if path.startswith('/'):
+            path = path[1:]
+    else:
+        path = abs_path
+    return path

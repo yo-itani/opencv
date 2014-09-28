@@ -5,10 +5,14 @@
 """
 
 import os
+import sys
 
 import MySQLdb
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import utils
+from opencv_config import BASE_DIR, DB_HOST, DB_PORT, DB_USER
+from opencv_config import DB_PASS, DB_NAME, IMAGE_TABLE
 
 IMAGE_FILE_EXTS = (
     '.jpg',
@@ -17,18 +21,13 @@ IMAGE_FILE_EXTS = (
     '.gif',
 )
 
-DB_HOST = 'localhost'
-DB_PORT = 3306
-DB_USER = 'blogwatcher'
-DB_PASS = 'blogwatcher!'
-DB_NAME = 'opencv'
-IMAGE_TABLE = 'devel_image'
 
 def main(dirname):
     conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT,
                            user=DB_USER, passwd=DB_PASS,
                            db=DB_NAME, charset='utf8')
-    for filename, directory in utils.filelist(dirname):
+    abspath = os.path.abspath(dirname)
+    for filename, directory in utils.filelist(abspath):
         root, ext = os.path.splitext(filename)
         if ext.lower() in IMAGE_FILE_EXTS:
             fpathname = os.path.join(directory, filename)
@@ -36,6 +35,8 @@ def main(dirname):
             if image_exists(conn, hash):
                 print "%s exists" % fpathname
                 continue
+            # BASE_DIRからの相対パスでDBに登録
+            directory = utils.get_related_path(BASE_DIR, directory)
             insert_image(conn, filename, directory, hash)
 
 

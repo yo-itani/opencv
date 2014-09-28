@@ -69,8 +69,23 @@ def cluster(request):
     return render(request, 'devel/cluster.html', context)
 
 def show_bing_images(request, page=1):
+    if 'status' in request.GET:
+        _change_status(request, page)
     image = Image.objects.get(id=page)
     context = {
+        'image': image,
         'image_file': image.get_image_path(),
+        'url': request.path,
     }
     return render(request, 'devel/show_bing_images.html', context)
+
+def _change_status(request, page):
+    if 'status' in request.GET:
+        status = request.GET['status']
+        if status.isdigit():
+            status = int(status)
+            prev_page = int(page) - 1
+            if prev_page < 1:
+                prev_page = 1
+            prev_image = Image.objects.get(id=prev_page)
+            prev_image.change_status(status)
