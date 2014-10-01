@@ -5,12 +5,13 @@ from .models import Image
 from django.shortcuts import render
 import modules.analyze_color_devel as ac
 
+from opencv_config import BASE_DIR
+from tools.utils import get_related_path
 # Create your views here.
 import csv
 CLUSTER_DATA = []
-#for row in csv.reader(open('/home/thatsping/opencv/develop/src_img/bayon/data/cluster2.tsv'), delimiter='\t'):
-#    CLUSTER_DATA.append(row)
-
+for row in csv.reader(open('/home/thatsping/opencv/develop/bag_of_features/data/cluster2.tsv'), delimiter='\t'):
+    CLUSTER_DATA.append(row)
 
 def index(request):
     if 'page' in request.GET:
@@ -61,14 +62,15 @@ def cluster(request):
         num = 1
     if page >= len(CLUSTER_DATA[num]):
         page = 1
+    img = get_related_path(BASE_DIR, CLUSTER_DATA[num][page])
     context = {
         'num': num,
         'page': page,
-        'img': CLUSTER_DATA[num][page][2:],
+        'img': img,
     }
     return render(request, 'devel/cluster.html', context)
 
-def show_bing_images(request, page=1):
+def check_image(request, page=1):
     if 'status' in request.GET:
         _change_status(request, page)
     image = Image.objects.get(id=page)
