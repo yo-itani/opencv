@@ -1,5 +1,6 @@
 import os
 from django.db import models
+from django.contrib import admin
 
 # Create your models here.
 class Image(models.Model):
@@ -37,3 +38,16 @@ class Image(models.Model):
     def ok(self):
         self.status = self.STATUS_CHOICES[1][0]
         self.save()
+
+
+class ImageGroupType(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+
+# Create your models here.
+class ImageGroup(models.Model):
+    num = models.IntegerField()
+    image_group_type = models.ForeignKey(ImageGroupType)
+    image = models.ForeignKey(Image)
+
+admin.site.register(ImageGroupType)
+admin.site.register(ImageGroup)

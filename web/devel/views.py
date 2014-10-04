@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from .models import Image
+from .models import Image, ImageGroup
 from django.shortcuts import render
 import modules.analyze_color_devel as ac
 
@@ -80,6 +80,17 @@ def check_image(request, page=1):
         'url': request.path,
     }
     return render(request, 'devel/show_bing_images.html', context)
+
+def image_group(request, image_group_type_id, num, page=1):
+    image_group = ImageGroup.objects.filter(image_group_type=int(image_group_type_id), num=int(num)).order_by('id')[int(page)-1]
+    context = {
+        'image_group_type_id': image_group_type_id,
+        'num': num,
+        'image': image_group.image,
+        'image_file': image_group.image.get_image_path(),
+        'url': request.path,
+    }
+    return render(request, 'devel/show_image_group.html', context)
 
 def _change_status(request, page):
     if 'status' in request.GET:
