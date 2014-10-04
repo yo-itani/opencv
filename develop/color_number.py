@@ -55,6 +55,12 @@ class ColorNumber(object):
         return v1 * self._num_val2_levels * self._num_val3_levels + \
                v2 * self._num_val3_levels + v3
 
+    def get_color_num_range(self):
+        return self._num_val1_levels * \
+               self._num_val2_levels * \
+               self._num_val3_levels
+
+
 def main():
     pass
 
